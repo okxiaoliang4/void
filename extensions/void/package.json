@@ -15,35 +15,112 @@
     "configuration": {
       "title": "API Keys",
       "properties": {
-        "void.whichApi": {
+        "void.provider": {
           "type": "string",
           "default": "anthropic",
-          "description": "Choose a model to use (anthropic | openai | greptile | ollama)"
+          "description": "Choose a provider (openai | anthropic | azure | greptile | ollama)",
+          "enum": [
+            "openai",
+            "anthropic",
+            "azure",
+            "greptile",
+            "ollama"
+          ]
         },
-        "void.anthropicApiKey": {
-          "type": "string",
-          "default": "",
-          "description": "Anthropic API Key"
+        "void.anthropic": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "default": "claude-3-5-sonnet-20240620",
+              "description": "Choose a model ('claude-3-5-sonnet-20240620' | 'claude-3-opus-20240229' | 'claude-3-sonnet-20240229' | 'claude-3-haiku-20240307')",
+              "enum": [
+                "claude-3-5-sonnet-20240620",
+                "claude-3-opus-20240229",
+                "claude-3-sonnet-20240229",
+                "claude-3-haiku-20240307"
+              ]
+            },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "baseURL": {
+                  "type": "string",
+                  "description": "Use a different URL prefix for API calls, e.g. to use proxy servers."
+                },
+                "apiKey": {
+                  "type": "string",
+                  "description": "Anthropic API key."
+                },
+                "headers": {
+                  "type": "object",
+                  "description": "Custom headers to include in the requests."
+                }
+              }
+            }
+          }
         },
-        "void.openAIApiKey": {
-          "type": "string",
-          "default": "",
-          "description": "OpenAI API Key"
-        },
-        "void.greptileApiKey": {
-          "type": "string",
-          "default": "",
-          "description": "Greptile API Key"
-        },
-        "void.githubPAT": {
-          "type": "string",
-          "default": "",
-          "description": "Greptile - Github PAT (gives Greptile access to your repo)"
-        },
-        "void.ollamaSettings": {
-          "type": "string",
-          "default": "",
-          "description": "Ollama settings (coming soon...)"
+        "void.openai": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "default": "gpt-4o",
+              "description": "Choose a model ('o1-preview' | 'o1-mini' | 'gpt-4o' | 'gpt-4o-2024-05-13' | 'gpt-4o-2024-08-06' | 'gpt-4o-mini' | 'gpt-4o-mini-2024-07-18' | 'gpt-4-turbo' | 'gpt-4-turbo-2024-04-09' | 'gpt-4-turbo-preview' | 'gpt-4-0125-preview' | 'gpt-4-1106-preview' | 'gpt-4' | 'gpt-4-0613' | 'gpt-3.5-turbo-0125' | 'gpt-3.5-turbo' | 'gpt-3.5-turbo-1106')",
+              "enum": [
+                "o1-preview",
+                "o1-mini",
+                "gpt-4o",
+                "gpt-4o-2024-05-13",
+                "gpt-4o-2024-08-06",
+                "gpt-4o-mini",
+                "gpt-4o-mini-2024-07-18",
+                "gpt-4-turbo",
+                "gpt-4-turbo-2024-04-09",
+                "gpt-4-turbo-preview",
+                "gpt-4-0125-preview",
+                "gpt-4-1106-preview",
+                "gpt-4",
+                "gpt-4-0613",
+                "gpt-3.5-turbo-0125",
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-1106"
+              ]
+            },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "baseURL": {
+                  "type": "string",
+                  "description": "Use a different URL prefix for API calls, e.g. to use proxy servers."
+                },
+                "apiKey": {
+                  "type": "string",
+                  "description": "OpenAI API key."
+                },
+                "headers": {
+                  "type": "object",
+                  "description": "Custom headers to include in the requests."
+                },
+                "organization": {
+                  "type": "string",
+                  "description": "OpenAI Organization."
+                },
+                "project": {
+                  "type": "string",
+                  "description": "OpenAI project."
+                },
+                "compatibility": {
+                  "type": "string",
+                  "description": "OpenAI compatibility mode. Should be set to `strict` when using the OpenAI API, and `compatible` when using 3rd party providers. In `compatible` mode, newer information such as streamOptions are not being sent. Defaults to 'compatible'.",
+                  "enum": [
+                    "strict",
+                    "compatible"
+                  ]
+                }
+              }
+            }
+          }
         }
       }
     },
