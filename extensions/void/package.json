@@ -273,10 +273,6 @@
                   "type": "string",
                   "description": "Greptile API key."
                 },
-                "githubPAT": {
-                  "type": "string",
-                  "description": "GitHub PAT."
-                },
                 "headers": {
                   "type": "object",
                   "description": "Custom headers to include in the requests.",
