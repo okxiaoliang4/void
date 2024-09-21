@@ -167,7 +167,7 @@ export const getAiModel = (apiConfig: ApiConfig) => {
     case 'openai': return createOpenAI(apiConfig.openai.providerSettings)(apiConfig.openai.model || 'gpt-4o')
     case 'anthropic': return createAnthropic(apiConfig.anthropic.providerSettings)(apiConfig.anthropic.model || 'claude-3-5-sonnet-20240620')
     case 'ollama': return createOllama(apiConfig.ollama.providerSettings)(apiConfig.ollama.model || 'llama3.1')
-    case 'azure': return createAzure(apiConfig.azure.providerSettings)(apiConfig.azure.deploymentId)
+    case 'azure': return createAzure(apiConfig.azure.providerSettings)(`${apiConfig.azure.deploymentId}`)
     default:
       throw new Error(`Error: provider was ${apiConfig.provider}, which is not recognized!`)
   }
