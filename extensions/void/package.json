@@ -253,7 +253,7 @@
               "properties": {
                 "baseURL": {
                   "type": "string",
-                  "description": "Ollama base URL."
+                  "description": "Ollama base URL. Local API server can be started with `OLLAMA_ORIGINS=* ollama serve`"
                 },
                 "headers": {
                   "type": "object",

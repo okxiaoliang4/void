@@ -56,7 +56,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
 
 		// Allow Ollama endpoint
-		const ollamaEndpoint = vscode.workspace.getConfiguration('void').get('ollamaSettings.endpoint') || 'http://localhost:11434'
+		const ollamaEndpoint = vscode.workspace.getConfiguration('void').get('ollama.providerSettings.baseURL') || 'http://127.0.0.1:11434'
 		const allowed_urls = ['https://api.anthropic.com', 'https://api.openai.com', 'https://api.greptile.com', ollamaEndpoint ]
 		webview.html = `<!DOCTYPE html>
       <html lang="en">
