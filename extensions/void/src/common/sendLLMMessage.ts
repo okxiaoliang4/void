@@ -5,38 +5,39 @@ import { AzureOpenAIProviderSettings, createAzure } from '@ai-sdk/azure';
 import { createOllama, OllamaProviderSettings } from 'ollama-ai-provider';
 
 export type ApiConfig = {
+  /** @default 'anthropic' */
+  provider: 'anthropic' | 'openai' | 'azure' | 'greptile' | 'ollama'
   anthropic: {
-    apiKey: string,
     /** @default 'claude-3-5-sonnet-20240620' */
-    model?: string,
-    setting?: AnthropicProviderSettings
+    model: string,
+    providerSettings?: AnthropicProviderSettings
   },
   openai: {
-    apiKey: string,
     /** @default 'gpt-4o' */
-    model?: string,
-    setting?: OpenAIProviderSettings
+    model: string,
+    providerSettings?: OpenAIProviderSettings
   },
   azure: {
-    apiKey: string,
     deploymentId: string,
-    setting?: AzureOpenAIProviderSettings
+    providerSettings?: AzureOpenAIProviderSettings
   },
   greptile: {
-    apikey: string,
-    githubPAT: string,
-    repoinfo: {
-      remote: string, // e.g. 'github'
-      repository: string, // e.g. 'voideditor/void'
-      branch: string // e.g. 'main'
+    providerSettings?: {
+      apikey?: string,
+      githubPAT?: string,
+      headers?: Record<string, string>,
+      repoinfo?: {
+        remote?: string, // e.g. 'github'
+        repository?: string, // e.g. 'voideditor/void'
+        branch?: string // e.g. 'main'
+      }[]
     }
   },
   ollama: {
     /** @default 'llama3.1' */
     model: string
-    setting: OllamaProviderSettings
+    providerSettings?: OllamaProviderSettings
   },
-  whichApi: string
 }
 
 type OnText = (newText: string, fullText: string) => void
@@ -82,14 +83,14 @@ const sendGreptileMsg: SendLLMMessageFnTypeInternal = ({ messages, onText, onFin
   fetch('https://api.greptile.com/v2/query', {
     method: 'POST',
     headers: {
-      "Authorization": `Bearer ${apiConfig.greptile.apikey}`,
-      "X-Github-Token": `${apiConfig.greptile.githubPAT}`,
+      "Authorization": `Bearer ${apiConfig.greptile.providerSettings?.apikey}`,
       "Content-Type": `application/json`,
+      ...apiConfig.greptile.providerSettings?.headers
     },
     body: JSON.stringify({
       messages,
       stream: true,
-      repositories: [apiConfig.greptile.repoinfo]
+      repositories: apiConfig.greptile.providerSettings?.repoinfo
     }),
   })
     // this is {message}\n{message}\n{message}...\n
@@ -137,9 +138,9 @@ const sendGreptileMsg: SendLLMMessageFnTypeInternal = ({ messages, onText, onFin
 
 export const sendLLMMessage: SendLLMMessageFnTypeExternal = ({ messages, onText, onFinalMessage, apiConfig }) => {
   if (!apiConfig) return { abort: () => { } }
-  const whichApi = apiConfig.whichApi
+  const provider = apiConfig.provider
   // TODO: create an @ai-sdk provider for greptile
-  if (whichApi === 'greptile')
+  if (provider === 'greptile')
     return sendGreptileMsg({ messages, onText, onFinalMessage, apiConfig })
 
   const model = getAiModel(apiConfig)
@@ -162,17 +163,12 @@ export const sendLLMMessage: SendLLMMessageFnTypeExternal = ({ messages, onText,
 }
 
 export const getAiModel = (apiConfig: ApiConfig) => {
-  switch (apiConfig.whichApi) {
-    case 'openai': return createOpenAI(apiConfig.openai.setting)(apiConfig.openai.model || 'gpt-4o')
-    case 'anthropic': return createAnthropic(apiConfig.anthropic.setting)(apiConfig.anthropic.model || 'claude-3-5-sonnet-20240620')
-    case 'ollama': return createOllama(apiConfig.ollama.setting)(apiConfig.ollama.model || 'llama3.1')
-    case 'azure': {
-      if (!apiConfig.azure.deploymentId) {
-        throw new Error(`Error: azure deploymentId is not defined`)
-      }
-      return createAzure(apiConfig.azure.setting)(apiConfig.azure.deploymentId)
-    }
+  switch (apiConfig.provider) {
+    case 'openai': return createOpenAI(apiConfig.openai.providerSettings)(apiConfig.openai.model || 'gpt-4o')
+    case 'anthropic': return createAnthropic(apiConfig.anthropic.providerSettings)(apiConfig.anthropic.model || 'claude-3-5-sonnet-20240620')
+    case 'ollama': return createOllama(apiConfig.ollama.providerSettings)(apiConfig.ollama.model || 'llama3.1')
+    case 'azure': return createAzure(apiConfig.azure.providerSettings)(apiConfig.azure.deploymentId)
     default:
-      throw new Error(`Error: provider was ${apiConfig.whichApi}, which is not recognized!`)
+      throw new Error(`Error: provider was ${apiConfig.provider}, which is not recognized!`)
   }
 }
